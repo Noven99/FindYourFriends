@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: user-center
+
+  # DataSource Config
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 如果安装了多版本的 MySQL，此处需要修改端口号
+    url: jdbc:mysql://localhost:3306/cosmos
+    username: root
+    password: 123456
+
+  # session失效时间
+  session:
+    timeout: 86400 #一天时间
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: false #关闭驼峰转下划线
+  global-config:
+    db-config:
+      logic-delete-field: isDelete
+      logic-delete-value: 1
+      logic-not-delete-value: 0
