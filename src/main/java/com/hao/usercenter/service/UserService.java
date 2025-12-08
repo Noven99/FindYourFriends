@@ -15,11 +15,14 @@ public interface UserService extends IService<User> {
 
 
     //用户注册
-    long userRegister(String account, String password, String checkPassword);
+    long userRegister(String account, String password, String checkPassword,String planetCode);
 
     //用户登录
     User userLogin(String account, String password, HttpServletRequest request);
 
     //【用户脱敏】
     User getSafeUser(User origionUser);
+
+    //用户注销
+    int userLogout(HttpServletRequest request);
 }

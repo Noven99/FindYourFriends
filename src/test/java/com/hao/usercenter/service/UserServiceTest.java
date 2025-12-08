@@ -38,38 +38,39 @@ class UserServiceTest {
         String userAccount = "测试2号";
         String password = "12345678";
         String checkPassword = "12345678";
-        long result = userService.userRegister(userAccount, password, checkPassword);
+        String planetCode = "1";
+        long result = userService.userRegister(userAccount, password, checkPassword,planetCode);
         Assertions.assertTrue(result > 0);
 
         //2,异常测试（账号名异常）
         userAccount = "";
-        result = userService.userRegister(userAccount, password, checkPassword);
+        result = userService.userRegister(userAccount, password, checkPassword,planetCode);
         Assertions.assertEquals(-1, result);
 
         userAccount = "测试2号@@@%&";
-        result = userService.userRegister(userAccount, password, checkPassword);
+        result = userService.userRegister(userAccount, password, checkPassword,planetCode);
         Assertions.assertEquals(-1, result);
 
         userAccount = "12";
-        result = userService.userRegister(userAccount, password, checkPassword);
+        result = userService.userRegister(userAccount, password, checkPassword,planetCode);
         Assertions.assertEquals(-1, result);
 
         //2,异常测试（密码异常）
         password = "123456";
         checkPassword = "123456";
-        result = userService.userRegister(userAccount, password, checkPassword);
+        result = userService.userRegister(userAccount, password, checkPassword,planetCode);
         Assertions.assertEquals(-1, result);
 
         password = "12345678";
         checkPassword = "123456";
-        result = userService.userRegister(userAccount, password, checkPassword);
+        result = userService.userRegister(userAccount, password, checkPassword,planetCode);
         Assertions.assertEquals(-1, result);
 
         //2,异常测试（账号名重复）
         userAccount = "测试2号";
         password = "123456789";
         checkPassword = "123456789";
-        result = userService.userRegister(userAccount, password, checkPassword);
+        result = userService.userRegister(userAccount, password, checkPassword,planetCode);
         Assertions.assertEquals(-1, result);
     }
 }
