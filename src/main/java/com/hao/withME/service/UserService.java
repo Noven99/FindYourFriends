@@ -1,9 +1,10 @@
-package com.hao.usercenter.service;
+package com.hao.withME.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.hao.usercenter.model.domain.User;
+import com.hao.withME.model.domain.User;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @author 86182
@@ -13,9 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 public interface UserService extends IService<User> {
 
 
-
     //用户注册
-    long userRegister(String account, String password, String checkPassword,String planetCode);
+    long userRegister(String account, String password, String checkPassword, String planetCode);
 
     //用户登录
     User userLogin(String account, String password, HttpServletRequest request);
@@ -25,4 +25,12 @@ public interface UserService extends IService<User> {
 
     //用户注销
     int userLogout(HttpServletRequest request);
+
+    /**
+     * 根据标签查询用户
+     *
+     * @param tagNameList
+     * @return
+     */
+    List<User> searchUsersByTags(List<String> tagNameList);
 }

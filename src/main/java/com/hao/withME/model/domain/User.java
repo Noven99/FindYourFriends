@@ -1,4 +1,4 @@
-package com.hao.usercenter.model.domain;
+package com.hao.withME.model.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
 
@@ -33,6 +33,11 @@ public class User implements Serializable {
      * 用户头像
      */
     private String avatarUrl;
+
+    /**
+     * 用户标签
+     */
+    private String tags;
 
     /**
      * 性别

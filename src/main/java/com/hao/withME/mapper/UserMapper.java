@@ -1,7 +1,10 @@
-package com.hao.usercenter.mapper;
+package com.hao.withME.mapper;
 
-import com.hao.usercenter.model.domain.User;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hao.withME.model.domain.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import java.util.List;
 
 /**
 * @author 86182
@@ -11,6 +14,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface UserMapper extends BaseMapper<User> {
 
+    List<User> selectList(QueryWrapper<Object> queryWrapper);
 }
 
 

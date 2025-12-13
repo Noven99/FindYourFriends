@@ -1,8 +1,8 @@
-package com.hao.usercenter.exception;
+package com.hao.withME.exception;
 
-import com.hao.usercenter.common.BaseResponse;
-import com.hao.usercenter.common.ErrorCode;
-import com.hao.usercenter.common.ResultUtils;
+import com.hao.withME.common.BaseResponse;
+import com.hao.withME.common.ErrorCode;
+import com.hao.withME.common.ResultUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

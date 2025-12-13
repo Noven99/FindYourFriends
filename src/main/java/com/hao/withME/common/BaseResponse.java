@@ -1,4 +1,4 @@
-package com.hao.usercenter.common;
+package com.hao.withME.common;
 
 import lombok.Data;
 

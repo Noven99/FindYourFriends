@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: withME
+
+  # DataSource Config
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 如果安装了多版本的 MySQL，此处需要修改端口号
+    url: jdbc:mysql://localhost:3306/cosmos
+    username: root
+    password: 123456
+

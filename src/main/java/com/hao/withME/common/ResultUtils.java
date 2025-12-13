@@ -1,4 +1,4 @@
-package com.hao.usercenter.common;
+package com.hao.withME.common;
 
 public class ResultUtils {
     public static <T> BaseResponse<T> success(T data) {

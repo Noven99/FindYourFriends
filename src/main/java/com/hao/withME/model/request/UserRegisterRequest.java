@@ -1,4 +1,4 @@
-package com.hao.usercenter.model.request;
+package com.hao.withME.model.request;
 
 import lombok.Data;
 

@@ -1,6 +1,6 @@
-package com.hao.usercenter.exception;
+package com.hao.withME.exception;
 
-import com.hao.usercenter.common.ErrorCode;
+import com.hao.withME.common.ErrorCode;
 
 public class BusinessException extends RuntimeException {
     private final int code;

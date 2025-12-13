@@ -1,25 +1,24 @@
-package com.hao.usercenter.controller;
+package com.hao.withME.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.hao.usercenter.common.BaseResponse;
-import com.hao.usercenter.common.ErrorCode;
-import com.hao.usercenter.common.ResultUtils;
-import com.hao.usercenter.exception.BusinessException;
-import com.hao.usercenter.model.domain.User;
-import com.hao.usercenter.model.request.UserLoginRequest;
-import com.hao.usercenter.model.request.UserRegisterRequest;
-import com.hao.usercenter.service.UserService;
+import com.hao.withME.common.BaseResponse;
+import com.hao.withME.common.ErrorCode;
+import com.hao.withME.common.ResultUtils;
+import com.hao.withME.exception.BusinessException;
+import com.hao.withME.model.domain.User;
+import com.hao.withME.model.request.UserLoginRequest;
+import com.hao.withME.model.request.UserRegisterRequest;
+import com.hao.withME.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.hao.usercenter.constant.UserConstant.ADMIN_ROLE;
-import static com.hao.usercenter.constant.UserConstant.USER_LOGIN_STATE;
+import static com.hao.withME.constant.UserConstant.ADMIN_ROLE;
+import static com.hao.withME.constant.UserConstant.USER_LOGIN_STATE;
 
 @RestController
 @RequestMapping("/user")

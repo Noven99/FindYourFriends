@@ -1,23 +1,31 @@
-package com.hao.usercenter.service.impl;
+package com.hao.withME.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.hao.usercenter.common.ErrorCode;
-import com.hao.usercenter.exception.BusinessException;
-import com.hao.usercenter.mapper.UserMapper;
-import com.hao.usercenter.model.domain.User;
-import com.hao.usercenter.service.UserService;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.hao.withME.common.ErrorCode;
+import com.hao.withME.exception.BusinessException;
+import com.hao.withME.mapper.UserMapper;
+import com.hao.withME.model.domain.User;
+import com.hao.withME.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-import static com.hao.usercenter.constant.UserConstant.USER_LOGIN_STATE;
+import static com.hao.withME.constant.UserConstant.USER_LOGIN_STATE;
 
 /**
  * @author 86182
@@ -165,6 +173,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         safeUser.setUserStatus(origionUser.getUserStatus());
         safeUser.setCreateTime(origionUser.getCreateTime());
         safeUser.setUserRole(origionUser.getUserRole());
+        safeUser.setTags(origionUser.getTags());
 
         return safeUser;
     }
@@ -173,6 +182,49 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     public int userLogout(HttpServletRequest request) {
         request.getSession().removeAttribute(USER_LOGIN_STATE); //移除登陆态
         return 2;
+    }
+
+    /**
+     * 根据标签查询用户
+     *
+     * @param tagNameList
+     * @return
+     */
+    @Override
+    public List<User> searchUsersByTags(List<String> tagNameList) {
+        if (CollectionUtils.isEmpty(tagNameList)) {
+            throw new BusinessException(ErrorCode.PARAMAS_ERROR);
+        }
+
+        // sql查询
+       /* QueryWrapper<Object> queryWrapper = new QueryWrapper<>();
+        //遍历标签 and 拼接模糊 查询
+        for (String tagName : tagNameList) {
+            queryWrapper = queryWrapper.like("tags", tagName);
+        }*/
+
+        //内存查询
+        //1 先查询所有用户
+        QueryWrapper<Object> queryWrapper = new QueryWrapper<>();
+        List<User> userList = userMapper.selectList(queryWrapper);
+        Gson gson = new Gson();
+
+        //2 在内存中判断是否包含要求的标签
+        return userList.stream().filter(user -> {
+            String tagStr = user.getTags();
+            if (StringUtils.isBlank(tagStr)) {
+                return false;
+            }
+            Set<String> tempTagNameSet = gson.fromJson(
+                    tagStr, new TypeToken<Set<String>>() {
+                    }.getType());
+            for (String s : tagNameList) {
+                if (!tempTagNameSet.contains(s)) {
+                    return false;
+                }
+            }
+            return true;
+        }).map(this::getSafeUser).collect(Collectors.toList());
     }
 
 

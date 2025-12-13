@@ -1,6 +1,6 @@
 spring:
   application:
-    name: user-center
+    name: withME
 
   # DataSource Config
   datasource:
@@ -21,6 +21,7 @@ server:
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: false #关闭驼峰转下划线
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
     db-config:
       logic-delete-field: isDelete

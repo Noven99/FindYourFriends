@@ -1,10 +1,10 @@
-package com.hao.usercenter;
+package com.hao.withME;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class UserCenterApplicationTests {
+class withMEApplicationTests {
 
     @Test
     void contextLoads() {

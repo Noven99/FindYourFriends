@@ -1,4 +1,4 @@
-package com.hao.usercenter.common;
+package com.hao.withME.common;
 
 public enum ErrorCode {
     SUCCESS(0, "ok", ""),

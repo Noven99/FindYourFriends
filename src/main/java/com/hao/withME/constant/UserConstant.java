@@ -1,4 +1,4 @@
-package com.hao.usercenter.constant;
+package com.hao.withME.constant;
 
 //用户常量，定义为接口，接口默认变量属性为 public static
 public interface UserConstant {
