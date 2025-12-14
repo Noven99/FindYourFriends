@@ -5,7 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@MapperScan("com.hao.usercenter.mapper")
+@MapperScan("com.hao.withME.mapper")
 public class WithMEApplication {
 
     public static void main(String[] args) {

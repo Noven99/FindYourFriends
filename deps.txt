@@ -1,0 +1,84 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------------------< com.hao:withME >---------------------------
+[INFO] Building withME 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-dependency-plugin:2.8:tree (default-cli) @ withME ---
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/doxia/doxia-sink-api/1.0-alpha-10/doxia-sink-api-1.0-alpha-10.pom
+Progress (1): 1.3 kB                    Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/doxia/doxia-sink-api/1.0-alpha-10/doxia-sink-api-1.0-alpha-10.pom (1.3 kB at 309 B/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/doxia/doxia/1.0-alpha-10/doxia-1.0-alpha-10.pom
+Progress (1): 4.1/9.2 kBProgress (1): 7.3/9.2 kBProgress (1): 9.2 kB                        Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/doxia/doxia/1.0-alpha-10/doxia-1.0-alpha-10.pom (9.2 kB at 3.6 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/maven-parent/6/maven-parent-6.pom
+Progress (1): 4.1/20 kBProgress (1): 8.2/20 kBProgress (1): 12/20 kB Progress (1): 16/20 kBProgress (1): 20 kB                      Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/maven-parent/6/maven-parent-6.pom (20 kB at 145 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/reporting/maven-reporting-impl/2.0.5/maven-reporting-impl-2.0.5.pom
+Progress (1): 4.1/4.2 kBProgress (1): 4.2 kB                        Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/reporting/maven-reporting-impl/2.0.5/maven-reporting-impl-2.0.5.pom (4.2 kB at 1.8 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/doxia/doxia-core/1.0/doxia-core-1.0.pom
+Progress (1): 2.4 kB                    Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/doxia/doxia-core/1.0/doxia-core-1.0.pom (2.4 kB at 13 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/codehaus/plexus/plexus-utils/1.5.7/plexus-utils-1.5.7.pom
+Progress (1): 2.9/8.1 kBProgress (1): 7.0/8.1 kBProgress (1): 8.1 kB                        Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/codehaus/plexus/plexus-utils/1.5.7/plexus-utils-1.5.7.pom (8.1 kB at 3.4 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/doxia/doxia-site-renderer/1.0/doxia-site-renderer-1.0.pom
+Progress (1): 4.1/4.4 kBProgress (1): 4.4 kB                        Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/doxia/doxia-site-renderer/1.0/doxia-site-renderer-1.0.pom (4.4 kB at 29 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/doxia/doxia-sitetools/1.0/doxia-sitetools-1.0.pom
+Progress (1): 4.1/9.6 kBProgress (1): 7.7/9.6 kBProgress (1): 9.6 kB                        Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/doxia/doxia-sitetools/1.0/doxia-sitetools-1.0.pom (9.6 kB at 3.9 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/doxia/doxia-decoration-model/1.0/doxia-decoration-model-1.0.pom
+Progress (1): 3.2 kB                    Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/doxia/doxia-decoration-model/1.0/doxia-decoration-model-1.0.pom (3.2 kB at 20 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/doxia/doxia-module-apt/1.0/doxia-module-apt-1.0.pom
+Progress (1): 2.3 kB                    Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/doxia/doxia-module-apt/1.0/doxia-module-apt-1.0.pom (2.3 kB at 15 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/doxia/doxia-modules/1.0/doxia-modules-1.0.pom
+Progress (1): 2.4 kB                    Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/doxia/doxia-modules/1.0/doxia-modules-1.0.pom (2.4 kB at 17 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/doxia/doxia-module-fml/1.0/doxia-module-fml-1.0.pom
+Progress (1): 2.7 kB                    Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/doxia/doxia-module-fml/1.0/doxia-module-fml-1.0.pom (2.7 kB at 20 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/doxia/doxia-module-xdoc/1.0/doxia-module-xdoc-1.0.pom
+Progress (1): 2.2 kB                    Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/doxia/doxia-module-xdoc/1.0/doxia-module-xdoc-1.0.pom (2.2 kB at 17 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/doxia/doxia-module-xhtml/1.0/doxia-module-xhtml-1.0.pom
+Progress (1): 1.6 kB                    Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/doxia/doxia-module-xhtml/1.0/doxia-module-xhtml-1.0.pom (1.6 kB at 12 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/shared/maven-doxia-tools/1.0.2/maven-doxia-tools-1.0.2.pom
+Progress (1): 4.1/5.9 kBProgress (1): 5.9 kB                        Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/shared/maven-doxia-tools/1.0.2/maven-doxia-tools-1.0.2.pom (5.9 kB at 1.2 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/shared/maven-shared-components/11/maven-shared-components-11.pom
+Progress (1): 4.1/8.3 kBProgress (1): 8.2/8.3 kBProgress (1): 8.3 kB                        Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/shared/maven-shared-components/11/maven-shared-components-11.pom (8.3 kB at 2.3 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/commons-validator/commons-validator/1.2.0/commons-validator-1.2.0.pom
+Progress (1): 4.1/9.1 kBProgress (1): 8.2/9.1 kBProgress (1): 9.1 kB                        Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/commons-validator/commons-validator/1.2.0/commons-validator-1.2.0.pom (9.1 kB at 100 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/xml-apis/xml-apis/2.0.2/xml-apis-2.0.2.pom
+Progress (1): 346 B                   Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/xml-apis/xml-apis/2.0.2/xml-apis-2.0.2.pom (346 B at 3.4 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/codehaus/plexus/plexus-archiver/2.3/plexus-archiver-2.3.pom
+Progress (1): 3.4 kB                    Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/codehaus/plexus/plexus-archiver/2.3/plexus-archiver-2.3.pom (3.4 kB at 593 B/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/codehaus/plexus/plexus-io/2.0.6/plexus-io-2.0.6.pom
+Progress (1): 2.2 kB                    Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/codehaus/plexus/plexus-io/2.0.6/plexus-io-2.0.6.pom (2.2 kB at 450 B/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/codehaus/plexus/plexus-components/1.2/plexus-components-1.2.pom
+Progress (1): 3.1 kB                    Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/codehaus/plexus/plexus-components/1.2/plexus-components-1.2.pom (3.1 kB at 993 B/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/codehaus/plexus/plexus-utils/3.0.9/plexus-utils-3.0.9.pom
+Progress (1): 3.1 kB                    Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/codehaus/plexus/plexus-utils/3.0.9/plexus-utils-3.0.9.pom (3.1 kB at 1.3 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/shared/file-management/1.2.1/file-management-1.2.1.pom
+Progress (1): 3.9 kB                    Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/shared/file-management/1.2.1/file-management-1.2.1.pom (3.9 kB at 43 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/shared/maven-shared-io/1.1/maven-shared-io-1.1.pom
+Progress (1): 4.1 kB                    Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/shared/maven-shared-io/1.1/maven-shared-io-1.1.pom (4.1 kB at 48 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/shared/maven-shared-components/8/maven-shared-components-8.pom
+Progress (1): 2.7 kB                    Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/shared/maven-shared-components/8/maven-shared-components-8.pom (2.7 kB at 33 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/maven-parent/7/maven-parent-7.pom
+Progress (1): 4.1/21 kBProgress (1): 7.3/21 kBProgress (1): 11/21 kB Progress (1): 15/21 kBProgress (1): 20/21 kBProgress (1): 21 kB                      Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/maven-parent/7/maven-parent-7.pom (21 kB at 191 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/maven-artifact/2.0.2/maven-artifact-2.0.2.pom
+Progress (1): 765 B                   Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/maven-artifact/2.0.2/maven-artifact-2.0.2.pom (765 B at 8.7 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/maven/2.0.2/maven-2.0.2.pom
+Progress (1): 4.1/13 kBProgress (1): 8.2/13 kBProgress (1): 12/13 kB Progress (1): 13 kB                      Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/maven/2.0.2/maven-2.0.2.pom (13 kB at 145 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/codehaus/plexus/plexus-utils/1.1/plexus-utils-1.1.pom
+Progress (1): 767 B                   Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/codehaus/plexus/plexus-utils/1.1/plexus-utils-1.1.pom (767 B at 9.5 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/maven-artifact-manager/2.0.2/maven-artifact-manager-2.0.2.pom
+Progress (1): 1.4 kB                    Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/maven-artifact-manager/2.0.2/maven-artifact-manager-2.0.2.pom (1.4 kB at 17 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/maven-repository-metadata/2.0.2/maven-repository-metadata-2.0.2.pom
+Progress (1): 1.3 kB                    Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/maven-repository-metadata/2.0.2/maven-repository-metadata-2.0.2.pom (1.3 kB at 15 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/wagon/wagon-provider-api/1.0-alpha-6/wagon-provider-api-1.0-alpha-6.pom
+Progress (1): 588 B                   Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/wagon/wagon-provider-api/1.0-alpha-6/wagon-provider-api-1.0-alpha-6.pom (588 B at 7.3 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/wagon/wagon/1.0-alpha-6/wagon-1.0-alpha-6.pom
+Progress (1): 4.1/6.4 kBProgress (1): 6.4 kB                        Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/wagon/wagon/1.0-alpha-6/wagon-1.0-alpha-6.pom (6.4 kB at 75 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/codehaus/plexus/plexus-utils/1.4.6/plexus-utils-1.4.6.pom
+Progress (1): 2.3 kB                    Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/codehaus/plexus/plexus-utils/1.4.6/plexus-utils-1.4.6.pom (2.3 kB at 24 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/shared/maven-dependency-analyzer/1.4/maven-dependency-analyzer-1.4.pom
+Progress (1): 3.6/5.2 kBProgress (1): 5.2 kB                        Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/shared/maven-dependency-analyzer/1.4/maven-dependency-analyzer-1.4.pom (5.2 kB at 2.0 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/maven-project/2.0.5/maven-project-2.0.5.pom
+Progress (1): 1.8 kB                    Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/maven-project/2.0.5/maven-project-2.0.5.pom (1.8 kB at 399 B/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/maven/2.0.5/maven-2.0.5.pom
+Progress (1): 4.1/5.7 kBProgress (1): 5.7 kB                        Downloaded from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/maven/2.0.5/maven-2.0.5.pom (5.7 kB at 1.2 kB/s)
+Downloading from alimaven: http://maven.aliyun.com/nexus/content/groups/public/org/apache/maven/maven-settings/2.0.5/maven-settings-2.0.5.pom
+Progress (1): 1.7 kB终止批处理操作吗(Y/N)? 

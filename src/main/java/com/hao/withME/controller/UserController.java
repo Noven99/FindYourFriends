@@ -68,7 +68,7 @@ public class UserController {
 
     //用户注销接口
     @PostMapping("/logout")
-    public BaseResponse<Integer> userLogin(HttpServletRequest request) {
+    public BaseResponse<Integer> userLogout(HttpServletRequest request) {
         //1，判断传入进来的是否为空
         if (request == null) {
             throw new BusinessException(ErrorCode.PARAMAS_ERROR);
