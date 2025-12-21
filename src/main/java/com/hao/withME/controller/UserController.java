@@ -10,6 +10,7 @@ import com.hao.withME.model.request.UserLoginRequest;
 import com.hao.withME.model.request.UserRegisterRequest;
 import com.hao.withME.service.UserService;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -22,6 +23,7 @@ import static com.hao.withME.constant.UserConstant.USER_LOGIN_STATE;
 
 @RestController
 @RequestMapping("/user")
+@CrossOrigin(origins = {"http://localhost:3000"})
 public class UserController {
 
     @Resource
@@ -35,8 +37,8 @@ public class UserController {
             throw new BusinessException(ErrorCode.PARAMAS_ERROR);
         }
         //2，获取传入进来的请求参数的数据
-        String account = userRegisterRequest.getAccount();
-        String password = userRegisterRequest.getPassword();
+        String account = userRegisterRequest.getUserAccount();
+        String password = userRegisterRequest.getUserPassword();
         String checkPassword = userRegisterRequest.getCheckPassword();
         String planetCode = userRegisterRequest.getPlanetCode();
         //3，对请求参数进行校验（这里的校验不涉及业务）
@@ -56,8 +58,8 @@ public class UserController {
             throw new BusinessException(ErrorCode.PARAMAS_ERROR);
         }
         //2，获取传入进来的请求参数的数据
-        String account = userLoginRequest.getAccount();
-        String password = userLoginRequest.getPassword();
+        String account = userLoginRequest.getUserAccount();
+        String password = userLoginRequest.getUserPassword();
         //3，对请求参数进行校验（这里的校验不涉及业务）
         if (StringUtils.isAnyBlank(account, password)) {
             throw new BusinessException(ErrorCode.PARAMAS_ERROR);
@@ -108,7 +110,7 @@ public class UserController {
         }*/
 
         //将上面这段代码抽出来写成方法（鉴权）
-        if (!isAdmin(request)) {
+        if (!userService.isAdmin(request)) {
             throw new BusinessException(ErrorCode.NO_AUTH);
         }
 
@@ -127,6 +129,22 @@ public class UserController {
         return ResultUtils.success(safeUserList);
     }
 
+    //用户更新
+    @PostMapping("/update")
+    public BaseResponse<Integer> updateUser(@RequestBody User user, HttpServletRequest request) {
+        //1,校验参数是否为空
+        if (user == null) {
+            throw new BusinessException(ErrorCode.PARAMAS_ERROR);
+        }
+
+        //2,校验权限
+        User loginUser = userService.getLoginUser(request);
+
+        //3,实际修改
+        int result = userService.updateUser(user, loginUser);
+        return ResultUtils.success(result);
+    }
+
     //根据 id 删除用户（仅管理员 HttpServletRequest request 获取用户的登录态判断是否为管理员）
     @PostMapping("/delete")
     public BaseResponse<Boolean> deleteUser(@RequestBody long id, HttpServletRequest request) {
@@ -138,7 +156,7 @@ public class UserController {
         }*/
 
         //将上面这段代码抽出来写成方法（鉴权）
-        if (!isAdmin(request)) {
+        if (!userService.isAdmin(request)) {
             throw new BusinessException(ErrorCode.NO_AUTH);
         }
 
@@ -147,14 +165,20 @@ public class UserController {
         return ResultUtils.success(b);
     }
 
-    //【鉴权】
-    private boolean isAdmin(HttpServletRequest request) {
-        //1，鉴权仅管理员可删除（获取用户登录态）
-        Object userInfo = request.getSession().getAttribute(USER_LOGIN_STATE);
-        User user = (User) userInfo;//转为 User 对象
-        if (user == null || user.getUserRole() != ADMIN_ROLE) {
-            return false;
+    /**
+     * 根据标签查询用户
+     *
+     * @param tagNameList
+     * @return
+     */
+    @GetMapping("/search/tags")
+    public BaseResponse<List<User>> searchUsersByTags(@RequestParam(required = false) List<String> tagNameList) {
+        if (CollectionUtils.isEmpty(tagNameList)) {
+            throw new BusinessException(ErrorCode.PARAMAS_ERROR);
         }
-        return true;
+        List<User> userList = userService.searchUsersByTags(tagNameList);
+        return ResultUtils.success(userList);
     }
+
+
 }

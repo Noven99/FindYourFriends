@@ -11,20 +11,19 @@ import com.hao.withME.model.domain.User;
 import com.hao.withME.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.hao.withME.constant.UserConstant.ADMIN_ROLE;
 import static com.hao.withME.constant.UserConstant.USER_LOGIN_STATE;
 
 /**
@@ -205,7 +204,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
         //内存查询
         //1 先查询所有用户
-        QueryWrapper<Object> queryWrapper = new QueryWrapper<>();
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         List<User> userList = userMapper.selectList(queryWrapper);
         Gson gson = new Gson();
 
@@ -227,6 +226,57 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }).map(this::getSafeUser).collect(Collectors.toList());
     }
 
+    //更新用户信息
+    @Override
+    public int updateUser(User user, User loginUser) {
+        long userId = user.getId(); //获取要修改用户的id
+        if (userId <= 0) { //判断能否在数据库中查到
+            throw new BusinessException(ErrorCode.PARAMAS_ERROR);
+        }
+        //如果是管理员，更新用户信息
+        //如果不是管理员，只更新用户自己的信息
+        if (!isAdmin(loginUser) && user.getId() != loginUser.getId()) {
+            throw new BusinessException(ErrorCode.NO_AUTH);
+        }
+        User oldUser = userMapper.selectById(userId);
+        if (oldUser == null) {
+            throw new BusinessException(ErrorCode.NULL_ERROR);
+        }
+        return userMapper.updateById(user);
+    }
+
+    //获取当前用户登陆信息
+    @Override
+    public User getLoginUser(HttpServletRequest request) {
+        if (request == null) {
+            return null;
+        }
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        if (userObj == null) {
+            throw new BusinessException(ErrorCode.NO_AUTH);
+        }
+        return (User) userObj;
+    }
+
+    //鉴权
+    @Override
+    public boolean isAdmin(HttpServletRequest request) {
+        //1，鉴权仅管理员可删除（获取用户登录态）
+        Object userInfo = request.getSession().getAttribute(USER_LOGIN_STATE);
+        User user = (User) userInfo;//转为 User 对象
+        if (user == null || user.getUserRole() != ADMIN_ROLE) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean isAdmin(User loginUser) {
+        if (loginUser == null || loginUser.getUserRole() != ADMIN_ROLE) {
+            return false;
+        }
+        return true;
+    }
 
 }
 
