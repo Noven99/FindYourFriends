@@ -1,6 +1,7 @@
 package com.hao.withME.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hao.withME.common.BaseResponse;
 import com.hao.withME.common.ErrorCode;
 import com.hao.withME.common.ResultUtils;
@@ -9,13 +10,17 @@ import com.hao.withME.model.domain.User;
 import com.hao.withME.model.request.UserLoginRequest;
 import com.hao.withME.model.request.UserRegisterRequest;
 import com.hao.withME.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.hao.withME.constant.UserConstant.ADMIN_ROLE;
@@ -24,10 +29,15 @@ import static com.hao.withME.constant.UserConstant.USER_LOGIN_STATE;
 @RestController
 @RequestMapping("/user")
 @CrossOrigin(origins = {"http://localhost:3000"})
+@Slf4j
 public class UserController {
 
     @Resource
     private UserService userService;
+
+
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
 
     //用户注册接口
     @PostMapping("/register")
@@ -127,6 +137,31 @@ public class UserController {
                 .map(user -> userService.getSafeUser(user))   // (2) 对每个用户脱敏
                 .collect(Collectors.toList());                // (3) 重新收集为 List
         return ResultUtils.success(safeUserList);
+    }
+
+
+    //推荐用户
+    @GetMapping("/recommend")
+    public BaseResponse<Page<User>> recommendUsers(long pageSize, long pageNum, HttpServletRequest request) {
+        User loginUser = userService.getLoginUser(request);
+        String redisKey = String.format("Hao:user:recommend:%s", loginUser.getId());
+        ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
+        // 如果有缓存，直接读缓存
+        Page<User> userPage = (Page<User>) valueOperations.get(redisKey);
+        if (userPage != null) {
+            return ResultUtils.success(userPage);
+        }
+
+        //2，针对 User 实体类对应的表，构造 sql 语句（查询）
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        userPage = userService.page(new Page<>(pageNum, pageSize), queryWrapper);
+        // 写缓存
+        try {
+            valueOperations.set(redisKey, userPage, 30000, TimeUnit.MILLISECONDS);
+        } catch (Exception e) {
+            log.error("redis set key error", e);
+        }
+        return ResultUtils.success(userPage);
     }
 
     //用户更新
