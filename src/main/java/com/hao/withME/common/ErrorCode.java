@@ -2,7 +2,7 @@ package com.hao.withME.common;
 
 public enum ErrorCode {
     SUCCESS(0, "ok", ""),
-    PARAMAS_ERROR(40000, "请求参数错误", ""),
+    PARAMS_ERROR(40000, "请求参数错误", ""),
     SYSTEM_ERROR(50000, "系统异常", ""),
     NULL_ERROR(40001, "请求数据为空", ""),
     NOT_LOGIN(40100, "未登录", ""),

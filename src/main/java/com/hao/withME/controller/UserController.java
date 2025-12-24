@@ -44,7 +44,7 @@ public class UserController {
     public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
         //1，判断传入进来的是否为空
         if (userRegisterRequest == null) {
-            throw new BusinessException(ErrorCode.PARAMAS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         //2，获取传入进来的请求参数的数据
         String account = userRegisterRequest.getUserAccount();
@@ -53,7 +53,7 @@ public class UserController {
         String planetCode = userRegisterRequest.getPlanetCode();
         //3，对请求参数进行校验（这里的校验不涉及业务）
         if (StringUtils.isAnyBlank(account, password, checkPassword, planetCode)) {
-            throw new BusinessException(ErrorCode.PARAMAS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
 
         long result = userService.userRegister(account, password, checkPassword, planetCode);
@@ -65,14 +65,14 @@ public class UserController {
     public BaseResponse<User> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
         //1，判断传入进来的是否为空
         if (userLoginRequest == null) {
-            throw new BusinessException(ErrorCode.PARAMAS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         //2，获取传入进来的请求参数的数据
         String account = userLoginRequest.getUserAccount();
         String password = userLoginRequest.getUserPassword();
         //3，对请求参数进行校验（这里的校验不涉及业务）
         if (StringUtils.isAnyBlank(account, password)) {
-            throw new BusinessException(ErrorCode.PARAMAS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         User user = userService.userLogin(account, password, request);
         return ResultUtils.success(user);
@@ -83,7 +83,7 @@ public class UserController {
     public BaseResponse<Integer> userLogout(HttpServletRequest request) {
         //1，判断传入进来的是否为空
         if (request == null) {
-            throw new BusinessException(ErrorCode.PARAMAS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         int i = userService.userLogout(request);
         return ResultUtils.success(i);
@@ -169,7 +169,7 @@ public class UserController {
     public BaseResponse<Integer> updateUser(@RequestBody User user, HttpServletRequest request) {
         //1,校验参数是否为空
         if (user == null) {
-            throw new BusinessException(ErrorCode.PARAMAS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
 
         //2,校验权限
@@ -209,7 +209,7 @@ public class UserController {
     @GetMapping("/search/tags")
     public BaseResponse<List<User>> searchUsersByTags(@RequestParam(required = false) List<String> tagNameList) {
         if (CollectionUtils.isEmpty(tagNameList)) {
-            throw new BusinessException(ErrorCode.PARAMAS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         List<User> userList = userService.searchUsersByTags(tagNameList);
         return ResultUtils.success(userList);

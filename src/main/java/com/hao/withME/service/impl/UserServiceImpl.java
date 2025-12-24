@@ -47,28 +47,28 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     public long userRegister(String account, String password, String checkPassword, String planetCode) {
         //1 校验参数（不能为空，长度，账号名不能重复）
         if (StringUtils.isAnyBlank(account, password, checkPassword, planetCode)) {
-            throw new BusinessException(ErrorCode.PARAMAS_ERROR, "参数为空");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
         }
         if (account.length() < 4) {
-            throw new BusinessException(ErrorCode.PARAMAS_ERROR, "用户账户过短");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户账户过短");
         }
         if (password.length() < 8 || checkPassword.length() < 8) {
-            throw new BusinessException(ErrorCode.PARAMAS_ERROR, "用户密码过短");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户密码过短");
         }
         if (planetCode.length() > 5) {
-            throw new BusinessException(ErrorCode.PARAMAS_ERROR, "星球编号过长");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "星球编号过长");
         }
 
         //账号不能包含特殊字符（直接网上搜Java用户名正则表达式校验特殊字符）
         String exceptionCharacter = "\\pP|\\pS|\\s+";
         Matcher matcher = Pattern.compile(exceptionCharacter).matcher(account);
         if (matcher.find()) {
-            throw new BusinessException(ErrorCode.PARAMAS_ERROR, "账户含有特殊字符");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账户含有特殊字符");
         }
 
         //密码和确认密码需要一样
         if (!password.equals(checkPassword)) {
-            throw new BusinessException(ErrorCode.PARAMAS_ERROR, "两次密码不一致");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "两次密码不一致");
         }
 
         //账号不能重复（这里需要查询数据库，如果账号名本身就无效，没必要再去数据库里面查询是否有重复账号名字）
@@ -76,7 +76,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         wrapper.eq("userAccount", account);//查询 userAccount 这一列有多少个 等于传入进来的 account 的记录
         long count = userMapper.selectCount(wrapper);//统计数量
         if (count > 0) {
-            throw new BusinessException(ErrorCode.PARAMAS_ERROR, "已经存在相同账户，账户不能重复");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "已经存在相同账户，账户不能重复");
         }
         ; //如果数量>0，则表明有一样的账号，账号重复了
 
@@ -85,7 +85,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         wrapper.eq("planetCode", planetCode);
         count = userMapper.selectCount(wrapper);
         if (count > 0) {
-            throw new BusinessException(ErrorCode.PARAMAS_ERROR, "星球编号不能重复");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "星球编号不能重复");
         }
 
         //2 对密码进行加密（Spring自带的Md5单向加密）
@@ -99,7 +99,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         user.setPlanetCode(planetCode);
         boolean save = this.save(user);//这里还是调用service里面的方法
         if (!save) {
-            throw new BusinessException(ErrorCode.PARAMAS_ERROR, "插入数据失败");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "插入数据失败");
         }
 
         return user.getId();
@@ -110,20 +110,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     public User userLogin(String account, String password, HttpServletRequest request) {
         //1，校验账户和密码
         if (StringUtils.isAnyBlank(account, password)) {
-            throw new BusinessException(ErrorCode.PARAMAS_ERROR, "参数为空");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
         }
         if (account.length() < 4) {
-            throw new BusinessException(ErrorCode.PARAMAS_ERROR, "用户账户过短");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户账户过短");
         }
         if (password.length() < 8) {
-            throw new BusinessException(ErrorCode.PARAMAS_ERROR, "用户密码过短");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户密码过短");
         }
 
         //账号不能包含特殊字符（直接网上搜Java用户名正则表达式校验特殊字符）
         String exceptionCharacter = "\\pP|\\pS|\\s+";
         Matcher matcher = Pattern.compile(exceptionCharacter).matcher(account);
         if (matcher.find()) {
-            throw new BusinessException(ErrorCode.PARAMAS_ERROR, "账户含有特殊字符");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账户含有特殊字符");
         }
 
         //2，对用户的密码进行加密和数据库的密码进行比较，查询用户是否存在
@@ -140,7 +140,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         //如果用户不存在
         if (user == null) {
             log.info("user login failed , account or password is not correct.");
-            throw new BusinessException(ErrorCode.PARAMAS_ERROR, "用户不存在");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在");
 
         }
 
@@ -157,7 +157,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     @Override
     public User getSafeUser(User origionUser) {
         if (origionUser == null) {
-            throw new BusinessException(ErrorCode.PARAMAS_ERROR, "用户不存在");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在");
         }
         User safeUser = new User();
 
@@ -192,7 +192,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     @Override
     public List<User> searchUsersByTags(List<String> tagNameList) {
         if (CollectionUtils.isEmpty(tagNameList)) {
-            throw new BusinessException(ErrorCode.PARAMAS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
 
         // sql查询
@@ -231,7 +231,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     public int updateUser(User user, User loginUser) {
         long userId = user.getId(); //获取要修改用户的id
         if (userId <= 0) { //判断能否在数据库中查到
-            throw new BusinessException(ErrorCode.PARAMAS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         //如果是管理员，更新用户信息
         //如果不是管理员，只更新用户自己的信息
