@@ -245,11 +245,21 @@ public class TeamController {
         teamQuery.setIdList(idList);
 
         List<TeamUserVO> teamList = teamService.listTeams(teamQuery, true);
+        //  如果根据 team 条件筛完后没有任何队伍了，直接返回，避免后面 in ()
+        if (teamList == null || teamList.isEmpty()) {
+            return ResultUtils.success(new ArrayList<>());
+        }
+
+
         teamList.forEach(team -> team.setHasJoin(true));
 
 
         //统计每个队伍加入的人数
         List<Long> teamIdList = teamList.stream().map(TeamUserVO::getId).collect(Collectors.toList());
+
+        if (teamIdList == null || teamIdList.isEmpty()) {
+            return ResultUtils.success(teamList);
+        }
 
         QueryWrapper<UserTeam> joinQueryWrapper = new QueryWrapper<>();
         joinQueryWrapper.in("teamId", teamIdList);
