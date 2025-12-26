@@ -20,44 +20,28 @@ public class User implements Serializable {
     private long id;
 
     /**
-     * 用户昵称
+     * 用户编号
      */
-    private String username;
+    private String userNo;
 
     /**
      * 账号
      */
     private String userAccount;
 
-    /**
-     * 用户头像
-     */
-    private String avatarUrl;
 
     /**
      * 用户标签
      */
     private String tags;
 
-    /**
-     * 性别
-     */
-    private Integer gender;
 
     /**
      * 密码
      */
     private String userPassword;
 
-    /**
-     * 电话
-     */
-    private String phone;
 
-    /**
-     * 邮箱
-     */
-    private String email;
 
     /**
      * 状态 0 - 正常
@@ -84,16 +68,6 @@ public class User implements Serializable {
      * 鉴权：用户角色：0为普通用户，1为管理员
      */
     private Integer userRole;
-
-    /**
-     * 星球编号
-     */
-    private String planetCode;
-
-    /**
-     * 个人简介
-     */
-    private String profile;
 
 
     @TableField(exist = false)

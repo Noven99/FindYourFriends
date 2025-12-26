@@ -1,7 +1,6 @@
 package com.hao.withME.utils;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 算法工具类
@@ -86,5 +85,62 @@ public class AlgorithmUtils {
             }
         }
         return d[n][m];
+    }
+
+    /**
+     * 余弦相似度算法
+     * 结果范围：[0, 1]，值越大越相似
+     *
+     * @param tagList1 用户1的标签列表
+     * @param tagList2 用户2的标签列表
+     * @return 相似度分数
+     */
+    public static double cosineSimilarity(List<String> tagList1, List<String> tagList2) {
+        if (tagList1 == null || tagList2 == null || tagList1.isEmpty() || tagList2.isEmpty()) {
+            return 0.0;
+        }
+        // 1. 统计标签频率
+        Map<String, Integer> map1 = getFrequencyMap(tagList1);
+        Map<String, Integer> map2 = getFrequencyMap(tagList2);
+
+        // 2. 取出两个人标签并集
+        Set<String> uniqueTags = new HashSet<>();
+        uniqueTags.addAll(map1.keySet());
+        uniqueTags.addAll(map2.keySet());
+
+        // 初始化
+        double dotProduct = 0.0;
+        double norm1 = 0.0;
+        double norm2 = 0.0;
+
+        for (String tag : uniqueTags) {
+            //匹配个人标签在所有标签中出现的频率（构造个人标签向量）
+            int v1 = map1.getOrDefault(tag, 0);
+            int v2 = map2.getOrDefault(tag, 0);
+
+            //点积
+            dotProduct += v1 * v2;
+            norm1 += Math.pow(v1, 2);
+            norm2 += Math.pow(v2, 2);
+        }
+
+        // 3 如果两个人标签完全不同，直接返回相似度为 0
+        if (norm1 == 0 || norm2 == 0) {
+            return 0.0;
+        }
+
+        //4 根据余弦相似定理返回相似度
+        return dotProduct / (Math.sqrt(norm1) * Math.sqrt(norm2));
+    }
+
+    /**
+     * 辅助方法：统计列表元素频次
+     */
+    private static Map<String, Integer> getFrequencyMap(List<String> list) {
+        Map<String, Integer> map = new HashMap<>();
+        for (String s : list) {
+            map.put(s, map.getOrDefault(s, 0) + 1);
+        }
+        return map;
     }
 }

@@ -50,13 +50,13 @@ public class UserController {
         String account = userRegisterRequest.getUserAccount();
         String password = userRegisterRequest.getUserPassword();
         String checkPassword = userRegisterRequest.getCheckPassword();
-        String planetCode = userRegisterRequest.getPlanetCode();
+        String tags = userRegisterRequest.getTags();
         //3，对请求参数进行校验（这里的校验不涉及业务）
-        if (StringUtils.isAnyBlank(account, password, checkPassword, planetCode)) {
+        if (StringUtils.isAnyBlank(account, password, checkPassword, tags)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
 
-        long result = userService.userRegister(account, password, checkPassword, planetCode);
+        long result = userService.userRegister(account, password, checkPassword, tags);
         return ResultUtils.success(result);
     }
 
@@ -144,19 +144,30 @@ public class UserController {
     @GetMapping("/recommend")
     public BaseResponse<Page<User>> recommendUsers(long pageSize, long pageNum, HttpServletRequest request) {
         User loginUser = userService.getLoginUser(request);
+        // 缓存 Key 是基于用户 ID 的，这很好，因为每个用户看到的列表（排除自己后）是不一样的
         String redisKey = String.format("Hao:user:recommend:%s", loginUser.getId());
         ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
-        // 如果有缓存，直接读缓存
+
+        // 1. 如果有缓存，直接读缓存
         Page<User> userPage = (Page<User>) valueOperations.get(redisKey);
         if (userPage != null) {
             return ResultUtils.success(userPage);
         }
 
-        //2，针对 User 实体类对应的表，构造 sql 语句（查询）
+        // 2. 构造查询条件
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        // 【核心修改】：添加排除当前登录用户的逻辑
+        // 意思为：查询 id != loginUser.getId() 的数据
+        if (loginUser != null) {
+            queryWrapper.ne("id", loginUser.getId());
+        }
+
+        // 3. 查询数据库
         userPage = userService.page(new Page<>(pageNum, pageSize), queryWrapper);
-        // 写缓存
+
+        // 4. 写缓存
         try {
+            // 30000 毫秒 = 30秒
             valueOperations.set(redisKey, userPage, 30000, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
             log.error("redis set key error", e);

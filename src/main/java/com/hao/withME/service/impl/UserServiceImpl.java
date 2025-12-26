@@ -20,10 +20,7 @@ import org.apache.commons.math3.util.Pair;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -49,9 +46,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     //用户注册
     @Override
-    public long userRegister(String account, String password, String checkPassword, String planetCode) {
+    public long userRegister(String account, String password, String checkPassword, String tags) {
         //1 校验参数（不能为空，长度，账号名不能重复）
-        if (StringUtils.isAnyBlank(account, password, checkPassword, planetCode)) {
+        if (StringUtils.isAnyBlank(account, password, checkPassword, tags)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
         }
         if (account.length() < 4) {
@@ -59,9 +56,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         if (password.length() < 8 || checkPassword.length() < 8) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户密码过短");
-        }
-        if (planetCode.length() > 5) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "星球编号过长");
         }
 
         //账号不能包含特殊字符（直接网上搜Java用户名正则表达式校验特殊字符）
@@ -85,23 +79,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         ; //如果数量>0，则表明有一样的账号，账号重复了
 
-        //星球编号不能重复（和上面使用的是同一个查询对象）
-        wrapper = new QueryWrapper<>();
-        wrapper.eq("planetCode", planetCode);
-        count = userMapper.selectCount(wrapper);
-        if (count > 0) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "星球编号不能重复");
-        }
 
         //2 对密码进行加密（Spring自带的Md5单向加密）
         String addSaltPassword = SALT + password;
         String encryptPassword = DigestUtils.md5DigestAsHex(addSaltPassword.getBytes());
 
-        //3 向数据库中插入数据
+        //3. 生成唯一的 UserNo (格式：大写字母-4位数字)
+        String userNo = generateUniqueUserNo();
+
+        //4 向数据库中插入数据
         User user = new User();
         user.setUserAccount(account);
         user.setUserPassword(encryptPassword);
-        user.setPlanetCode(planetCode);
+        user.setTags(tags);
+        user.setUserNo(userNo);
         boolean save = this.save(user);//这里还是调用service里面的方法
         if (!save) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "插入数据失败");
@@ -167,17 +158,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         User safeUser = new User();
 
         safeUser.setId(origionUser.getId());
-        safeUser.setUsername(origionUser.getUsername());
         safeUser.setUserAccount(origionUser.getUserAccount());
-        safeUser.setAvatarUrl(origionUser.getAvatarUrl());
-        safeUser.setPlanetCode(origionUser.getPlanetCode());
-        safeUser.setGender(origionUser.getGender());
-        safeUser.setPhone(origionUser.getPhone());
-        safeUser.setEmail(origionUser.getEmail());
         safeUser.setUserStatus(origionUser.getUserStatus());
         safeUser.setCreateTime(origionUser.getCreateTime());
         safeUser.setUserRole(origionUser.getUserRole());
         safeUser.setTags(origionUser.getTags());
+        safeUser.setUserNo(origionUser.getUserNo());
 
         return safeUser;
     }
@@ -289,12 +275,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         queryWrapper.select("id", "tags");
         queryWrapper.isNotNull("tags");
         List<User> userList = this.list(queryWrapper);
+
         String tags = loginUser.getTags();
         Gson gson = new Gson();
-        List<String> tagList = gson.fromJson(tags, new TypeToken<List<String>>() {
-        }.getType());
+        List<String> tagList = gson.fromJson(tags, new TypeToken<List<String>>() {}.getType());
+
         // 用户列表的下标 => 相似度
-        List<Pair<User, Long>> list = new ArrayList<>();
+        List<Pair<User, Double>> list = new ArrayList<>();
+
         // 依次计算所有用户和当前用户的相似度
         for (int i = 0; i < userList.size(); i++) {
             User user = userList.get(i);
@@ -303,21 +291,44 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             if (StringUtils.isBlank(userTags) || user.getId() == loginUser.getId()) {
                 continue;
             }
-            List<String> userTagList = gson.fromJson(userTags, new TypeToken<List<String>>() {
-            }.getType());
+            List<String> userTagList = gson.fromJson(userTags, new TypeToken<List<String>>() {}.getType());
             // 计算分数
-            long distance = AlgorithmUtils.minDistance(tagList, userTagList);
-            list.add(new Pair<>(user, distance));
+            double similarity = AlgorithmUtils.cosineSimilarity(tagList, userTagList);
+
+            // --- 调试打印开始 ---
+            System.out.println("用户ID: " + user.getId() + ", 相似度得分: " + similarity);
+            // --- 调试打印结束 ---
+
+            list.add(new Pair<>(user, similarity));
         }
-        // 按编辑距离由小到大排序
-        List<Pair<User, Long>> topUserPairList = list.stream()
-                .sorted((a, b) -> (int) (a.getValue() - b.getValue()))
+
+        // 按分数由大到小排序 (降序)
+        List<Pair<User, Double>> topUserPairList = list.stream()
+                .sorted((a, b) -> {
+                    // 这是一个更稳健的降序写法，防止 null 或精度问题
+                    Double scoreA = a.getValue();
+                    Double scoreB = b.getValue();
+                    return scoreB.compareTo(scoreA);
+                })
                 .limit(num)
                 .collect(Collectors.toList());
+
+        // --- 调试打印排序后的结果 ---
+        System.out.println("排序后的 ID 顺序: " + topUserPairList.stream()
+                .map(pair -> pair.getKey().getId()).collect(Collectors.toList()));
+        // -------------------------
+
         // 原本顺序的 userId 列表
         List<Long> userIdList = topUserPairList.stream().map(pair -> pair.getKey().getId()).collect(Collectors.toList());
+
+        // 如果没有匹配的用户，直接返回空列表，防止下面 SQL 报错
+        if (userIdList.isEmpty()) {
+            return new ArrayList<>();
+        }
+
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
         userQueryWrapper.in("id", userIdList);
+
         // 1, 3, 2
         // User1、User2、User3
         // 1 => User1, 2 => User2, 3 => User3
@@ -325,6 +336,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
                 .stream()
                 .map(user -> getSafeUser(user))
                 .collect(Collectors.groupingBy(User::getId));
+
         List<User> finalUserList = new ArrayList<>();
         for (Long userId : userIdList) {
             finalUserList.add(userIdUserListMap.get(userId).get(0));
@@ -351,6 +363,35 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         List<User> userList = userMapper.selectList(queryWrapper);
         return userList.stream().map(this::getSafeUser).collect(Collectors.toList());
+    }
+
+    /**
+     * 生成唯一的 UserNo
+     * 格式：大写字母-4位数字，例如 Z-0002
+     */
+    private String generateUniqueUserNo() {
+        String userNo;
+        // 循环生成，直到数据库中不存在该编号
+        while (true) {
+            // 1. 生成随机大写字母 (A-Z)
+            char randomChar = (char) ('A' + new Random().nextInt(26));
+            // 2. 生成随机4位数字 (0000-9999)
+            String randomNumber = String.format("%04d", new Random().nextInt(10000));
+
+            userNo = randomChar + "-" + randomNumber;
+
+            // 3. 查重
+            QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("userNo", userNo);
+            Long count = userMapper.selectCount(queryWrapper);
+
+            // 如果数量为0，说明不重复，跳出循环
+            if (count == 0) {
+                break;
+            }
+            // 否则继续循环生成
+        }
+        return userNo;
     }
 
 }

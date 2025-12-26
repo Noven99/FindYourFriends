@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hao.withME.mapper.ChatMessageMapper">
+
+    <resultMap id="BaseResultMap" type="com.hao.withME.model.domain.ChatMessage">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="type" column="type" jdbcType="TINYINT"/>
+            <result property="senderId" column="sender_id" jdbcType="BIGINT"/>
+            <result property="receiverId" column="receiver_id" jdbcType="BIGINT"/>
+            <result property="teamId" column="team_id" jdbcType="BIGINT"/>
+            <result property="content" column="content" jdbcType="VARCHAR"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,type,sender_id,
+        receiver_id,team_id,content,
+        create_time
+    </sql>
+
+    <select id="selectChatList" resultType="com.hao.withME.model.vo.ChatListVO">
+        /* 最终查询：对合并后的结果按时间倒序 */
+        SELECT * FROM (
+        /* Part 1: 私聊列表 */
+        SELECT
+        targetId,
+        u.userNo AS targetName,
+        0 AS type,
+        content AS lastMessage,
+        /* 修复点：这里必须指定 private_chat.createTime，否则会和 user 表的字段冲突 */
+        private_chat.createTime AS lastMessageTime,
+        unreadNum
+        FROM (
+        SELECT
+        /* 确定聊天对象ID */
+        CASE WHEN sender_id = #{userId} THEN receiver_id ELSE sender_id END AS targetId,
+        /* 获取最新的一条消息内容 */
+        content,
+        create_time AS createTime,
+        /* 统计未读数 */
+        (SELECT COUNT(*) FROM chat_message cm2
+        WHERE cm2.sender_id = (CASE WHEN t1.sender_id = #{userId} THEN t1.receiver_id ELSE t1.sender_id END)
+        AND cm2.receiver_id = #{userId}
+        AND cm2.is_read = 0
+        ) AS unreadNum
+        FROM chat_message t1
+        WHERE (sender_id = #{userId} OR receiver_id = #{userId})
+        AND type = 0
+        /* 取最新记录 */
+        AND id = (
+        SELECT MAX(id) FROM chat_message t2
+        WHERE (
+        (t2.sender_id = t1.sender_id AND t2.receiver_id = t1.receiver_id)
+        OR
+        (t2.sender_id = t1.receiver_id AND t2.receiver_id = t1.sender_id)
+        )
+        AND t2.type = 0
+        )
+        ) AS private_chat
+        LEFT JOIN user u ON private_chat.targetId = u.id
+
+        UNION ALL
+
+        /* Part 2: 群聊列表 */
+        SELECT
+        t.id AS targetId,
+        t.name AS targetName,
+        1 AS type,
+        team_chat.content AS lastMessage,
+        /* 这里你已经写对了 team_chat.createTime，所以 Part 2 没报错 */
+        team_chat.createTime AS lastMessageTime,
+        0 AS unreadNum
+        FROM (
+        SELECT
+        team_id,
+        content,
+        create_time AS createTime
+        FROM chat_message t1
+        WHERE type = 1
+        AND team_id IN
+        <foreach collection="teamIds" item="teamId" open="(" separator="," close=")">
+            #{teamId}
+        </foreach>
+        AND id = (
+        SELECT MAX(id) FROM chat_message t2
+        WHERE t2.team_id = t1.team_id AND t2.type = 1
+        )
+        ) AS team_chat
+        LEFT JOIN team t ON team_chat.team_id = t.id
+        ) AS combined_chat
+        ORDER BY lastMessageTime DESC
+    </select>
+
+    <!-- 结果映射 -->
+    <resultMap id="VOResultMap" type="com.hao.withME.model.vo.ChatMessageVO" extends="BaseResultMap">
+        <result property="senderName" column="senderName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 关联查询：查询消息表 + 用户表 -->
+    <select id="selectTeamChatHistory" resultMap="VOResultMap">
+        SELECT
+        cm.*,
+        u.userNo AS senderName  <!-- 这里假设你想展示 userNo，如果想展示 username 改成 u.username -->
+        FROM chat_message cm
+        LEFT JOIN user u ON cm.sender_id = u.id
+        WHERE cm.team_id = #{teamId}
+        AND cm.type = 1
+        ORDER BY cm.create_time ASC
+    </select>
+
+</mapper>
