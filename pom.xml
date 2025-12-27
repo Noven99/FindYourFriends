@@ -161,7 +161,6 @@
                 <version>${spring-boot.version}</version>
                 <configuration>
                     <mainClass>com.hao.withME.WithMEApplication</mainClass>
-                    <skip>true</skip>
                 </configuration>
                 <executions>
                     <execution>

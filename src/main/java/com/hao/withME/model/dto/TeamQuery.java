@@ -54,4 +54,9 @@ public class TeamQuery extends PageRequest {
      * 0 - 公开，1 - 私有，2 - 加密
      */
     private Integer status;
+
+    /**
+     * 【新增】支持多状态查询（例如同时查 1和2）
+     */
+    private List<Integer> statusList;
 }

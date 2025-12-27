@@ -6,10 +6,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.hao.withME.mapper.UserTeamMapper;
 import com.hao.withME.model.domain.ChatMessage;
+import com.hao.withME.model.domain.User;
 import com.hao.withME.model.domain.UserTeam;
+import com.hao.withME.model.vo.ChatMessageVO;
 import com.hao.withME.service.ChatMessageService;
+import com.hao.withME.service.UserService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -32,6 +36,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
     @Resource
     private UserTeamMapper userTeamMapper;
+    @Resource
+    private UserService userService;
 
     private static final Gson gson = new Gson();
 
@@ -72,21 +78,37 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         // 1. 保存到数据库
         chatMessageService.save(chatMessage);
 
+        // 2. === 关键修改开始 ===
+        // 构建 VO 对象，准备填充 senderName
+        ChatMessageVO messageVO = new ChatMessageVO();
+        BeanUtils.copyProperties(chatMessage, messageVO);
+
+        // 查询发送者信息
+        User sender = userService.getById(senderId);
+        if (sender != null) {
+            // 这里对应你 SQL 里的 u.userNo AS senderName
+            messageVO.setSenderName(sender.getUserNo());
+        } else {
+            messageVO.setSenderName("未知用户");
+        }
+        // === 关键修改结束 ===
+
+
         // 2. 广播/发送逻辑
         Integer type = chatMessage.getType();
         if (type == null || type == 0) {
             // === 私聊 ===
             Long receiverId = chatMessage.getReceiverId();
             if (receiverId != null) {
-                sendToUser(receiverId, chatMessage);
-                sendToUser(senderId, chatMessage);
+                sendToUser(receiverId, messageVO);
+                sendToUser(senderId, messageVO);
             }
         } else if (type == 1) {
             // === 群聊 ===
             Long teamId = chatMessage.getTeamId();
             if (teamId != null) {
-                sendToTeam(teamId, chatMessage, senderId);
-                sendToUser(senderId, chatMessage);
+                sendToTeam(teamId, messageVO, senderId);
+                sendToUser(senderId, messageVO);
             }
         }
     }
@@ -99,7 +121,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         }
     }
 
-    private void sendToUser(Long receiverId, ChatMessage message) {
+    private void sendToUser(Long receiverId, Object message) {
         WebSocketSession receiverSession = onlineSessions.get(receiverId);
         if (receiverSession != null && receiverSession.isOpen()) {
             try {
@@ -114,12 +136,9 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     /**
      * 修复点：使用 LambdaQueryWrapper 避免列名错误
      */
-    private void sendToTeam(Long teamId, ChatMessage message, Long excludeUserId) {
-        // 使用 LambdaQueryWrapper，让 MP 自动解析列名
+    private void sendToTeam(Long teamId, Object message, Long excludeUserId) {
         LambdaQueryWrapper<UserTeam> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(UserTeam::getTeamId, teamId);
-        // 如果你的实体类里有 isDelete 字段，请解开下面这行；如果没有，请删除
-        // queryWrapper.eq(UserTeam::getIsDelete, 0);
 
         List<UserTeam> userTeams = userTeamMapper.selectList(queryWrapper);
 

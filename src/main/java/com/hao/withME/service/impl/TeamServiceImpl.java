@@ -25,6 +25,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -32,6 +34,7 @@ import java.util.stream.Collectors;
 
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 /**
 * @author 86182
@@ -151,6 +154,20 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team>
     @Override
     public List<TeamUserVO> listTeams(TeamQuery teamQuery, boolean isAdmin) {
         QueryWrapper<Team> queryWrapper = new QueryWrapper<>();
+
+        // 1. 在方法内部获取当前登录用户
+        User loginUser = null;
+        try {
+            // 通过 Spring 上下文获取 Request
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            // 获取当前用户 (如果未登录可能会抛异常或返回null，视具体实现而定)
+            if (request != null) {
+                loginUser = userService.getLoginUser(request);
+            }
+        } catch (Exception e) {
+            // 未登录或获取失败，loginUser 保持为 null，不影响后续逻辑（只是查不到私有队伍）
+        }
+
         // 组合查询条件
         if (teamQuery != null) {
             Long id = teamQuery.getId();
@@ -183,17 +200,62 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team>
             if (userId != null && userId > 0) {
                 queryWrapper.eq("userId", userId);
             }
-            // 根据 status 来查询
+
+            List<Integer> statusList = teamQuery.getStatusList();
             Integer status = teamQuery.getStatus();
-            if (status != null) {
+
+            // 场景 A: 前端传了 statusList (比如 Private Tab 传了 [1, 2])
+            if (CollectionUtils.isNotEmpty(statusList)) {
+                User finalLoginUser = loginUser; // lambda 表达式需要 final 变量
+
+                queryWrapper.and(qw -> {
+                    // 1. 处理加密房间 (Status = 2) -> 所有人可见
+                    if (statusList.contains(TeamStatusEnum.SECRET.getValue())) {
+                        qw.or().eq("status", TeamStatusEnum.SECRET.getValue());
+                    }
+
+                    // 2. 处理私有房间 (Status = 1) -> 仅自己可见
+                    if (statusList.contains(TeamStatusEnum.PRIVATE.getValue())) {
+                        // 如果未登录，根本查不到私有房间，所以必须 loginUser != null
+                        if (finalLoginUser != null) {
+                            qw.or(subQw -> {
+                                subQw.eq("status", TeamStatusEnum.PRIVATE.getValue());
+                                // 如果不是管理员，只能看自己创建的
+                                if (!isAdmin) {
+                                    subQw.eq("userId", finalLoginUser.getId());
+                                }
+                            });
+                        } else if (isAdmin) {
+                            // 如果是管理员但没获取到 loginUser 对象(罕见)，也可以看私有
+                            qw.or().eq("status", TeamStatusEnum.PRIVATE.getValue());
+                        }
+                    }
+
+                    // 3. 处理公开房间 (Status = 0)
+                    if (statusList.contains(TeamStatusEnum.PUBLIC.getValue())) {
+                        qw.or().eq("status", TeamStatusEnum.PUBLIC.getValue());
+                    }
+                });
+            }
+            // 场景 B: 兼容旧逻辑 (只传 status)
+            else if (status != null && status > -1) {
                 TeamStatusEnum statusEnum = TeamStatusEnum.getEnumByValue(status);
-                if (statusEnum == null) {
-                    throw new BusinessException(ErrorCode.PARAMS_ERROR, "Team status is invalid");
+                if (statusEnum == null) statusEnum = TeamStatusEnum.PUBLIC;
+
+                if (statusEnum.equals(TeamStatusEnum.PRIVATE)) {
+                    // 查私有：必须登录且是自己的
+                    if (loginUser != null) {
+                        queryWrapper.eq("status", TeamStatusEnum.PRIVATE.getValue());
+                        if (!isAdmin) {
+                            queryWrapper.eq("userId", loginUser.getId());
+                        }
+                    } else {
+                        // 未登录查私有，直接让它查不到
+                        queryWrapper.eq("status", -1);
+                    }
+                } else {
+                    queryWrapper.eq("status", statusEnum.getValue());
                 }
-                if (!isAdmin && statusEnum.equals(TeamStatusEnum.PRIVATE)) {
-                    throw new BusinessException(ErrorCode.NO_AUTH);
-                }
-                queryWrapper.eq("status", statusEnum.getValue());
             }
         }
         // 不展示已过期的队伍

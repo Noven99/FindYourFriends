@@ -124,8 +124,7 @@ public class TeamController {
                 team.setHasJoin(hasJoin);
             });
         } catch (Exception e) {
-            // 建议至少打个日志，避免完全吃异常
-            // log.error("listTeams - set hasJoin error", e);
+            log.error("listTeams - set hasJoin error", e);
         }
 
         // 3. 查询已加入队伍的人数
@@ -210,7 +209,54 @@ public class TeamController {
         }
         User loginUser = userService.getLoginUser(request);
         teamQuery.setUserId(loginUser.getId());
+        // 1. 查询我创建的队伍列表 (此时 hasJoinNum 还是 null)
         List<TeamUserVO> teamList = teamService.listTeams(teamQuery, true);
+
+        // 提取队伍 ID 列表
+        final List<Long> teamIdList = teamList.stream()
+                .map(TeamUserVO::getId)
+                .collect(Collectors.toList());
+
+        // 如果一个队伍都没有，直接返回，省得查数据库
+        if (teamIdList.isEmpty()) {
+            return ResultUtils.success(teamList);
+        }
+
+        // 2. 补充 hasJoin 字段 (虽然是我创建的，但我肯定加入了，不过为了逻辑统一还是查一下，或者你可以直接设为 true)
+        // 这里为了和你 /list 保持完全一致，我还是保留了查询逻辑
+        try {
+            QueryWrapper<UserTeam> userTeamQueryWrapper = new QueryWrapper<>();
+            userTeamQueryWrapper.eq("userId", loginUser.getId());
+            userTeamQueryWrapper.in("teamId", teamIdList);
+            List<UserTeam> userTeamList = userTeamService.list(userTeamQueryWrapper);
+
+            Set<Long> hasJoinTeamIdSet = userTeamList.stream()
+                    .map(UserTeam::getTeamId)
+                    .collect(Collectors.toSet());
+
+            teamList.forEach(team -> {
+                boolean hasJoin = hasJoinTeamIdSet.contains(team.getId());
+                team.setHasJoin(hasJoin);
+            });
+        } catch (Exception e) {
+            log.error("listTeams - set hasJoin error", e);
+        }
+
+        // 3. 补充 hasJoinNum 字段 (查询已加入队伍的人数)
+        QueryWrapper<UserTeam> userTeamJoinQueryWrapper = new QueryWrapper<>();
+        userTeamJoinQueryWrapper.in("teamId", teamIdList);
+        List<UserTeam> userTeamList = userTeamService.list(userTeamJoinQueryWrapper);
+
+        // 队伍 id => 加入这个队伍的用户列表
+        Map<Long, List<UserTeam>> teamIdUserTeamList = userTeamList.stream()
+                .collect(Collectors.groupingBy(UserTeam::getTeamId));
+
+        teamList.forEach(team -> {
+            int joinNum = teamIdUserTeamList
+                    .getOrDefault(team.getId(), new ArrayList<>())
+                    .size();
+            team.setHasJoinNum(joinNum);
+        });
         return ResultUtils.success(teamList);
     }
 
